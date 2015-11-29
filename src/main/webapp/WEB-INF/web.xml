@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         version="2.5" metadata-complete="true">
+
+    <display-name>Agent Masternode</display-name>
+    <description>Masternode</description>
+
+	<context-param>
+	    <param-name>contextConfigLocation</param-name>
+	    <param-value>/WEB-INF/spring-context.xml</param-value>
+	</context-param>
+	<listener>
+	    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener> 
+
+	<servlet>
+	    <servlet-name>servlet</servlet-name>
+	    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	    <init-param>
+	        <param-name>contextConfigLocation</param-name>
+	        <param-value>/WEB-INF/servlet-context.xml</param-value>
+	    </init-param>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+	    <servlet-name>default</servlet-name>
+	    <url-pattern>/favicon.ico</url-pattern>
+	    <url-pattern>/robots.txt</url-pattern>
+	    <url-pattern>/css/*</url-pattern>
+	    <url-pattern>/fonts/*</url-pattern>
+	    <url-pattern>/js/*</url-pattern>
+	    <url-pattern>/img/*</url-pattern>
+	    <url-pattern>/static/*</url-pattern>
+	</servlet-mapping>   
+	
+	<servlet-mapping>
+	    <servlet-name>servlet</servlet-name>
+	    <url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- -->
+	<servlet>
+	    <servlet-name>default</servlet-name>
+	    <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
+	    <init-param>
+	      <param-name>useFileMappedBuffer</param-name>
+	      <param-value>false</param-value>
+	    </init-param>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
+     
+</web-app>        

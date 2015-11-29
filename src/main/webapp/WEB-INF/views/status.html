@@ -1,0 +1,19 @@
+<h1>Status of datanodes</h1>
+<table class="table">
+<tr>
+	<th>IP</th>
+	<th>Timestamp</th>
+	<th>Freespace</th>
+</tr>
+
+#foreach ($status in $snapshot)
+<tr>
+	<td>${status.ip}</td>
+	<td>${status.currentTime}</td>
+	<td>${status.freeSpace}</td>
+</tr>
+#end
+
+</table>
+
+
