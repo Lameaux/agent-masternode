@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.euromoby.agent.masternode.core.status.DatanodeStatusService;
-import com.euromoby.agent.masternode.web.ping.PingRequest;
-import com.euromoby.agent.masternode.web.ping.PingResponse;
+import com.euromoby.agent.model.PingRequest;
+import com.euromoby.agent.model.PingResponse;
 
 @Controller
 public class PingController {

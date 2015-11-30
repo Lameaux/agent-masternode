@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.euromoby.agent.masternode.web.ping.PingRequest;
+import com.euromoby.agent.model.PingRequest;
 
 @Component
 public class DatanodeStatusService {
@@ -32,4 +32,12 @@ public class DatanodeStatusService {
 		return updateTime;
 	}
 
+	public DatanodeStatus getFreeDatanode() {
+		List<DatanodeStatus> snapshot = getStatusSnapshot();
+		if (snapshot.isEmpty()) {
+			return null;
+		}
+		return snapshot.get(0);
+	}
+	
 }
