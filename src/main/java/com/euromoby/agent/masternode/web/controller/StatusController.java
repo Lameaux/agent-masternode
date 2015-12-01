@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.euromoby.agent.masternode.core.status.DatanodeStatusService;
+import com.euromoby.agent.masternode.core.model.DatanodeStatusService;
 
 @Controller
 public class StatusController {

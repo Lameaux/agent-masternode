@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.euromoby.agent.http.HttpClientProvider;
-import com.euromoby.agent.masternode.core.status.DatanodeStatus;
-import com.euromoby.agent.masternode.core.status.DatanodeStatusService;
+import com.euromoby.agent.masternode.core.model.DatanodeStatus;
+import com.euromoby.agent.masternode.core.model.DatanodeStatusService;
 import com.euromoby.agent.model.UploadTicket;
 import com.google.gson.Gson;
 
@@ -57,7 +57,7 @@ public class UploadService {
 
 		RequestConfig.Builder requestConfigBuilder = httpClientProvider.createRequestConfigBuilder();
 
-		String url = "https://" + datanodeStatus.getIp() + ":18080/upload/ticket";
+		String url = "https://" + datanodeStatus.getIp() + ":18080/ticket/upload";
 
 		HttpUriRequest request = RequestBuilder.get(url).setConfig(requestConfigBuilder.build()).build();
 

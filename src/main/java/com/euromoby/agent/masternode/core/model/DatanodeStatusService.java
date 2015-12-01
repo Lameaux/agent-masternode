@@ -1,4 +1,4 @@
-package com.euromoby.agent.masternode.core.status;
+package com.euromoby.agent.masternode.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
