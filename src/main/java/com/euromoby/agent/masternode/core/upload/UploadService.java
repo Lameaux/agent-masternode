@@ -8,8 +8,9 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,8 @@ import org.springframework.stereotype.Component;
 import com.euromoby.agent.http.HttpClientProvider;
 import com.euromoby.agent.masternode.core.model.DatanodeStatus;
 import com.euromoby.agent.masternode.core.model.DatanodeStatusService;
-import com.euromoby.agent.model.UploadTicket;
+import com.euromoby.agent.masternode.core.model.UploadedFile;
+import com.euromoby.agent.model.DatanodeFile;
 import com.google.gson.Gson;
 
 @Component
@@ -35,32 +37,46 @@ public class UploadService {
 	@Autowired
 	private HttpClientProvider httpClientProvider;
 
-	public String getUploadUrl() throws Exception {
+	@Autowired
+	private IdGeneratorService idGeneratorService;
 
+	public UploadedFile uploadFile(String fileName, String contentType, byte[] content) throws Exception {
+
+		String fileId = idGeneratorService.generateId();
+		String uploadUrl = getUploadUrl(fileId); 
+
+		UploadedFile uploadedFile = new UploadedFile();
+		uploadedFile.setId(fileId);
+		uploadedFile.setContentType(contentType);
+		uploadedFile.setFileName(fileName);
+		uploadedFile.setSize(content.length);
+		uploadedFile.setUrl(uploadUrl);		
+		
+		// do real upload
+		DatanodeFile datanodeFile = uploadFile(uploadedFile, content);
+
+		return uploadedFile;
+	}
+
+	public String getUploadUrl(String fileId) throws Exception {
 		DatanodeStatus datanodeStatus = datanodeStatusService.getFreeDatanode();
-
 		if (datanodeStatus != null) {
-			try {
-				UploadTicket uploadTicket = getUploadTicket(datanodeStatus);
-				String uploadTicketId = uploadTicket.getId();
-				return "https://" + datanodeStatus.getIp() + ":18080/upload/" + uploadTicketId;
-			} catch (Exception e) {
-				log.error("Unable to get ticket", e);
-				throw e;
-			}
+			return "https://" + datanodeStatus.getIp() + ":18080/upload/" + fileId;
 		}
-
 		throw new Exception("No data nodes");
 	}
 
-	private UploadTicket getUploadTicket(DatanodeStatus datanodeStatus) throws IOException {
+	private DatanodeFile uploadFile(UploadedFile uploadedFile, byte[] content) throws IOException {
 
 		RequestConfig.Builder requestConfigBuilder = httpClientProvider.createRequestConfigBuilder();
 
-		String url = "https://" + datanodeStatus.getIp() + ":18080/ticket/upload";
+		HttpPost request = new HttpPost(uploadedFile.getUrl());
+		request.setConfig(requestConfigBuilder.build());
 
-		HttpUriRequest request = RequestBuilder.get(url).setConfig(requestConfigBuilder.build()).build();
-
+		HttpEntity requestMultipartEntity = MultipartEntityBuilder.create()
+				.addBinaryBody("file", content, ContentType.parse(uploadedFile.getContentType()), uploadedFile.getFileName()).build();
+		request.setEntity(requestMultipartEntity);		
+		
 		CloseableHttpResponse response = httpClientProvider.executeRequest(request);
 		try {
 			StatusLine statusLine = response.getStatusLine();
@@ -72,7 +88,7 @@ public class UploadService {
 			HttpEntity entity = response.getEntity();
 			String json = EntityUtils.toString(entity, Consts.UTF_8);
 			EntityUtils.consumeQuietly(entity);
-			return gson.fromJson(json, UploadTicket.class);
+			return gson.fromJson(json, DatanodeFile.class);
 		} finally {
 			response.close();
 		}
