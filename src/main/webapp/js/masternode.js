@@ -7,12 +7,12 @@ function uploadFile(file) {
 	$.ajax({
 		url : '/upload',
 		data : oMyForm,
-		dataType : 'text',
+		dataType : 'json',
 		processData : false,
 		contentType : false,
 		type : 'POST',
 		success : function(data) {
-			$('#result').html(data);
+			$('#result').html('<img src="' + data.url + '" alt="' + data.fileName + '" />');
 		}
 	});
 }

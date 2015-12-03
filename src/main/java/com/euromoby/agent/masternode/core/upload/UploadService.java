@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.euromoby.agent.Constants;
 import com.euromoby.agent.http.HttpClientProvider;
 import com.euromoby.agent.masternode.core.model.DatanodeStatus;
 import com.euromoby.agent.masternode.core.model.DatanodeStatusService;
@@ -46,33 +47,34 @@ public class UploadService {
 	public UploadedFile uploadFile(String fileName, String contentType, MultipartFile mpf) throws Exception {
 
 		String fileId = idGeneratorService.generateId();
-		String uploadUrl = getUploadUrl(fileId);
+		String uploadUrl = getDataNodeUrl() + Constants.NODE_URL_UPLOAD + "/" + fileId;
+		String getUrl = getDataNodeUrl() + Constants.NODE_URL_GET + "/" + fileId;		
 
 		UploadedFile uploadedFile = new UploadedFile();
 		uploadedFile.setId(fileId);
 		uploadedFile.setContentType(contentType);
 		uploadedFile.setFileName(fileName);
-		uploadedFile.setUrl(uploadUrl);
+		uploadedFile.setUrl(getUrl);
 
 		// do real upload
-		uploadFile(uploadedFile, mpf);
+		uploadFile(uploadedFile, uploadUrl, mpf);
 
 		return uploadedFile;
 	}
 
-	public String getUploadUrl(String fileId) throws Exception {
+	public String getDataNodeUrl() throws Exception {
 		DatanodeStatus datanodeStatus = datanodeStatusService.getFreeDatanode();
 		if (datanodeStatus != null) {
-			return "https://" + datanodeStatus.getIp() + ":18080/upload/" + fileId;
+			return "https://" + datanodeStatus.getIp() + ":18080";
 		}
 		throw new Exception("No data nodes");
 	}
 
-	private void uploadFile(UploadedFile uploadedFile, MultipartFile mpf) throws IOException {
+	private void uploadFile(UploadedFile uploadedFile, String uploadUrl, MultipartFile mpf) throws IOException {
 
 		RequestConfig.Builder requestConfigBuilder = httpClientProvider.createRequestConfigBuilder();
 
-		HttpPost request = new HttpPost(uploadedFile.getUrl());
+		HttpPost request = new HttpPost(uploadUrl);
 		request.setConfig(requestConfigBuilder.build());
 
 		InputStream mpfInputStream = mpf.getInputStream();
