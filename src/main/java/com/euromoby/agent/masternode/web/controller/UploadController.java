@@ -30,7 +30,7 @@ public class UploadController {
     public @ResponseBody UploadedFile uploadPost(MultipartHttpServletRequest request) throws Exception {
     	Iterator<String> fileNamesIterator = request.getFileNames();
     	MultipartFile mpf = request.getFile(fileNamesIterator.next());
-    	return uploadService.uploadFile(mpf.getOriginalFilename(), mpf.getContentType(), mpf.getBytes());
+    	return uploadService.uploadFile(mpf.getOriginalFilename(), mpf.getContentType(), mpf);
     }
 	
 }
